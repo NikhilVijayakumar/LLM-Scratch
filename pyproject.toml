@@ -1,0 +1,43 @@
+[project]
+name = "tinygpt"
+version = "0.1.0"
+description = "GPT-style language model pretrained from scratch on TinyStories"
+requires-python = ">=3.12"
+dependencies = [
+    "torch>=2.4",
+    "tiktoken>=0.7",
+    "datasets>=3.0",
+    "numpy>=1.26",
+]
+
+[dependency-groups]
+# GGUF export: HF format + deps of llama.cpp's convert_hf_to_gguf.py
+export = [
+    "transformers>=4.57",
+    "safetensors>=0.4",
+    "sentencepiece>=0.2",
+    "pyyaml>=6",
+    "tqdm>=4",
+]
+
+[project.scripts]
+tinygpt-train = "tinygpt.train:main"
+tinygpt-generate = "tinygpt.generate:main"
+tinygpt-export-hf = "tinygpt.export_hf:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/tinygpt"]
+
+# No NVIDIA GPU on this machine: pull the small CPU-only torch wheel.
+# Delete this block (and the [tool.uv.sources] one) on a CUDA box.
+[[tool.uv.index]]
+name = "pytorch-cpu"
+url = "https://download.pytorch.org/whl/cpu"
+explicit = true
+
+[tool.uv.sources]
+torch = { index = "pytorch-cpu" }
